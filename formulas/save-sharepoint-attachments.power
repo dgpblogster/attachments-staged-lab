@@ -1,0 +1,21 @@
+// Save button OnSelect, SharePoint attachment column.
+// The Attachments output goes straight to Patch; no form required.
+//
+// Two parts matter more than the Patch:
+//   IsBlank guard  - the control will stage files with NO record selected.
+//   IfError        - Patch is the operation that can actually fail. OnError on the
+//                    control fires for ADD failures only, never for save failures.
+// The lone `true` after the semicolon gives IfError a success value to return.
+If(
+    IsBlank(RequestsGallery.Selected),
+    Notify("Select a request before saving.", NotificationType.Warning),
+    IfError(
+        Patch(
+            Requests,
+            RequestsGallery.Selected,
+            {Attachments: Attachments1.Attachments}
+        ); true,
+        Notify("Attachments couldn't be saved. " & FirstError.Message, NotificationType.Error),
+        Notify("Attachments saved.", NotificationType.Success)
+    )
+)

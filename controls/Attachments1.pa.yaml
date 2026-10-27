@@ -1,0 +1,20 @@
+# Modern Attachments control, SharePoint attachment-column shape.
+#
+# Verbatim from the Microsoft Learn example for this control, which is the point:
+# it is the shape Microsoft documents, not one I invented. Source:
+# https://learn.microsoft.com/power-apps/maker/canvas-apps/controls/modern-controls/modern-control-attachments
+#
+# Assumes a gallery named RequestsGallery over a SharePoint list with attachments enabled.
+# This YAML defines the control only. The save lives in the button, see formulas/.
+- Attachments1:
+    Control: ModernAttachments@1.3.0
+    Properties:
+      Items: =RequestsGallery.Selected.Attachments
+      MaxAttachments: =5
+      MaxAttachmentSize: =10
+      AcceptedFileTypes: =[".pdf", ".docx"]
+      AccessibleLabel: ="Supporting documents for the selected request"
+      DisplayMode: =If(IsBlank(RequestsGallery.Selected), DisplayMode.Disabled, DisplayMode.Edit)
+      Width: =Min(Parent.Width, 480)
+      Height: =300
+      OnError: =Notify(Self.LastError.Message, NotificationType.Error)

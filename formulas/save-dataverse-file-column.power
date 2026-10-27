@@ -1,0 +1,31 @@
+// Save button OnSelect, Dataverse FILE COLUMN (not an attachment column).
+//
+// A file column holds ONE file per record and will not accept the control's
+// Attachments table. Build a single record from the staged file's Name and Value.
+// Passing the whole table at a file column is the first mistake everybody makes.
+//
+// Set the control's Items to Blank() for this shape, so it stages a new upload
+// instead of displaying the file already stored in the column.
+// Saving REPLACES whatever is in the column. Reset() clears the staged upload only;
+// it does not delete the stored file.
+If(
+    IsBlank(DocumentsGallery.Selected),
+    Notify("Select a record before saving.", NotificationType.Warning),
+    IsEmpty(FileUpload1.Attachments),
+    Notify("Choose a file before saving.", NotificationType.Warning),
+    IfError(
+        Patch(
+            'Project Documents',
+            DocumentsGallery.Selected,
+            {
+                'Document File': {
+                    FileName: First(FileUpload1.Attachments).Name,
+                    Value: First(FileUpload1.Attachments).Value
+                }
+            }
+        ); true,
+        Notify("File couldn't be saved. " & FirstError.Message, NotificationType.Error),
+        Reset(FileUpload1);
+        Notify("File saved.", NotificationType.Success)
+    )
+)
